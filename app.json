@@ -7,14 +7,17 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+
     "ios": {
       "supportsTablet": true
     },
+
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
@@ -23,14 +26,23 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
+
     "web": {
       "favicon": "./assets/favicon.png"
     },
+
     "plugins": [
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Permita o acesso à localização para registrar o local do chamado."
+          "locationWhenInUsePermission": "Permita o acesso à localização para registrar o local do chamado."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Permita o acesso à câmera para tirar fotos do equipamento.",
+          "photosPermission": "Permita o acesso às fotos para anexar uma imagem ao chamado."
         }
       ]
     ]

@@ -12,7 +12,11 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 
-export default function NewCallScreen() {
+// Etapa 1: Importações do Firebase e da sua configuração
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db, ALUNO_ID } from '../firebase/config';
+
+export default function NewCallScreen({ navigation }: any) {
   // Estados: "caixinhas" que guardam o que o usuário digita ou a foto que escolhe
   const [description, setDescription] = useState('');
   const [photoUri, setPhotoUri] = useState<string | null>(null);
@@ -22,6 +26,9 @@ export default function NewCallScreen() {
 
   // Controla o texto "Buscando localização..." enquanto aguardamos o GPS
   const [loadingLocation, setLoadingLocation] = useState(false);
+
+  // Etapa 2: Novo useState para controlar o processo de salvamento
+  const [saving, setSaving] = useState(false);
 
   // Função para tirar foto com a câmera
   async function handleTakePhoto() {
@@ -118,6 +125,29 @@ export default function NewCallScreen() {
     }
   }
 
+  // Etapa 3: Função de criação do chamado no Firestore
+  async function handleCreateCall() {
+    setSaving(true);
+    try {
+      await addDoc(collection(db, 'alunos', ALUNO_ID, 'chamados'), {
+        description,
+        photoUri,
+        address,
+        status: 'aberto',
+        criadoEm: serverTimestamp(),
+      });
+      Alert.alert('Sucesso', 'Chamado registrado!');
+      setDescription('');
+      setPhotoUri(null);
+      setAddress(null);
+      navigation.navigate('CallList');
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível salvar o chamado. Tente novamente.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
       <Text style={styles.title}>Novo Chamado</Text>
@@ -189,16 +219,19 @@ export default function NewCallScreen() {
         </Text>
       </TouchableOpacity>
 
+      {/* Ajuste no botão "Criar Chamado" para tratar o estado de saving */}
       <TouchableOpacity
         style={[
           styles.button,
           styles.confirmButton,
-          !description && styles.disabledButton,
+          (!description || saving) && styles.disabledButton,
         ]}
-        disabled={!description}
-        onPress={() => Alert.alert('Sucesso', 'Chamado registrado localmente!')}
+        disabled={!description || saving}
+        onPress={handleCreateCall}
       >
-        <Text style={styles.buttonText}>Criar Chamado</Text>
+        <Text style={styles.buttonText}>
+          {saving ? 'Salvando...' : 'Criar Chamado'}
+        </Text>
       </TouchableOpacity>
     </ScrollView>
   );
