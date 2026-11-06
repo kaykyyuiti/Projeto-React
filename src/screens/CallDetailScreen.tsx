@@ -9,6 +9,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+<<<<<<< HEAD
+=======
+import * as Notifications from 'expo-notifications';
+>>>>>>> edac5ec (SLA)
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db, ALUNO_ID } from '../firebase/config';
 
@@ -17,6 +21,10 @@ type Chamado = {
   photoUri?: string | null;
   address?: string | null;
   status: string;
+<<<<<<< HEAD
+=======
+  slaNotificationId?: string;
+>>>>>>> edac5ec (SLA)
 };
 
 export default function CallDetailScreen({ route }: any) {
@@ -54,6 +62,18 @@ export default function CallDetailScreen({ route }: any) {
       const docRef = doc(db, 'alunos', ALUNO_ID, 'chamados', chamadoId);
       await updateDoc(docRef, { status: novoStatus });
 
+<<<<<<< HEAD
+=======
+      // Se o chamado foi atendido a tempo (ou cancelado),
+      // cancela o alerta de SLA que ainda não disparou
+      if (
+        (novoStatus === 'atendendo' || novoStatus === 'cancelado') &&
+        chamado?.slaNotificationId
+      ) {
+        await Notifications.cancelScheduledNotificationAsync(chamado.slaNotificationId);
+      }
+
+>>>>>>> edac5ec (SLA)
       setChamado((prev) => (prev ? { ...prev, status: novoStatus } : null));
       Alert.alert('Sucesso', `Status alterado para "${novoStatus}".`);
     } catch (error) {

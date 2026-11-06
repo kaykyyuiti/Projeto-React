@@ -17,6 +17,10 @@ type Chamado = {
   photoUri?: string | null;
   address?: string | null;
   status: string;
+<<<<<<< HEAD
+=======
+  slaNotificationId?: string;
+>>>>>>> edac5ec (SLA)
 };
 
 export default function CallListScreen({ navigation }: any) {

@@ -11,11 +11,24 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
+<<<<<<< HEAD
 
 // Etapa 1: Importações do Firebase e da sua configuração
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db, ALUNO_ID } from '../firebase/config';
 
+=======
+import * as Notifications from 'expo-notifications';
+
+// Etapa 1: Importações do Firebase e da sua configuração
+import { collection, addDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { db, ALUNO_ID } from '../firebase/config';
+
+// Prazo de atendimento (SLA) em segundos.
+// Em produção, substituir por um valor real (ex.: 2 horas = 2 * 60 * 60)
+const SLA_SECONDS = 10;
+
+>>>>>>> edac5ec (SLA)
 export default function NewCallScreen({ navigation }: any) {
   // Estados: "caixinhas" que guardam o que o usuário digita ou a foto que escolhe
   const [description, setDescription] = useState('');
@@ -129,13 +142,55 @@ export default function NewCallScreen({ navigation }: any) {
   async function handleCreateCall() {
     setSaving(true);
     try {
+<<<<<<< HEAD
       await addDoc(collection(db, 'alunos', ALUNO_ID, 'chamados'), {
+=======
+      const docRef = await addDoc(collection(db, 'alunos', ALUNO_ID, 'chamados'), {
+>>>>>>> edac5ec (SLA)
         description,
         photoUri,
         address,
         status: 'aberto',
         criadoEm: serverTimestamp(),
       });
+<<<<<<< HEAD
+=======
+
+      // O chamado já foi salvo; falhas na notificação não devem
+      // fazer o app informar que o chamado não foi gravado
+      try {
+        // Pede permissão para enviar notificações
+        const permission = await Notifications.requestPermissionsAsync();
+
+        if (permission.granted) {
+          // Agenda a notificação de alerta do SLA
+          const notificationId = await Notifications.scheduleNotificationAsync({
+            content: {
+              title: 'TechCall - Alerta de SLA',
+              body: 'O prazo de atendimento de um chamado expirou!',
+              data: { chamadoId: docRef.id },
+            },
+            trigger: {
+              type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+              seconds: SLA_SECONDS,
+              channelId: 'chamados',
+            },
+          });
+
+          // Salva o id da notificação no Firestore para poder cancelá-la se atendido
+          await updateDoc(docRef, { slaNotificationId: notificationId });
+        } else {
+          // Orienta o usuário caso a permissão tenha sido negada
+          Alert.alert(
+            'Permissão de Notificação Negada',
+            'Você não receberá alertas de SLA. Para ativar, habilite as notificações nas configurações do seu celular.'
+          );
+        }
+      } catch (notificationError) {
+        console.log('Erro ao agendar notificação de SLA:', notificationError);
+      }
+
+>>>>>>> edac5ec (SLA)
       Alert.alert('Sucesso', 'Chamado registrado!');
       setDescription('');
       setPhotoUri(null);
